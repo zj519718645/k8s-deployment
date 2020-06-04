@@ -1,0 +1,20 @@
+{
+    "CN": "system:kube-controller-manager",
+    "key": {
+        "algo": "rsa",
+        "size": 2048
+    },
+    "hosts": [
+      "127.0.0.1",
+      "{{K8S_MASTERS}}"
+    ],
+    "names": [
+      {
+        "C": "CN",
+        "ST": "GuangZhou",
+        "L": "GuangZhou",
+        "O": "system:kube-controller-manager",
+        "OU": "IT"
+      }
+    ]
+}
