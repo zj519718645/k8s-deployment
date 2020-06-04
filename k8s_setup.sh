@@ -7,19 +7,19 @@
 #=========define global varables=======
 #dynamic variables
 #master IP list,at least 1
-K8S_MASTERS="10.0.0.241"
+K8S_MASTERS=""
 MASTER_ROOT_PASS=""
 #node IP list,at least 3
-K8S_NODES="10.0.0.242,10.0.0.243,10.0.0.244"
+K8S_NODES=""
 NODE_ROOT_PASS=""
 #pod cluster ip range
-POD_CLUSTER_IP="10.52.0.0/16"
+POD_CLUSTER_IP=""
 #service cluster ip range
-SERVICE_CLUSTER_IP="10.53.0.0/16"
+SERVICE_CLUSTER_IP=""
 #kubernetes ip
-KUBERNETES_IP="10.53.0.1"
+KUBERNETES_IP=""
 #kubernetes dns ip
-KUBERNETES_DNS_IP="10.53.0.2"
+KUBERNETES_DNS_IP=""
 
 #========define global functions=======
 FILE_TRANSFER() {
