@@ -476,7 +476,7 @@ kubectl create clusterrolebinding kubelet-bootstrap --clusterrole=system:node-bo
 sed "s/{{KUBERNETES_DNS_IP}}/${KUBERNETES_DNS_IP}/g" kubelet.config.json >/srv/salt/kubelet.config.json
 
 
-\cp kube-proxy.service >/srv/salt/kube-proxy.service
+\cp kube-proxy.service /srv/salt/kube-proxy.service
 if [ -f "kube-proxy.kubeconfig" ];then
     rm kube-proxy.kubeconfig
 fi
