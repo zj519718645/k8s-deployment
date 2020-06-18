@@ -7,13 +7,13 @@
 #=========define global varables=======
 #dynamic variables
 WORKSTATION_HOST="10.0.0.240"
-WORKSTATION_ROOT_PASS="kd11111"
+WORKSTATION_ROOT_PASS=""
 #master IP list,at least 1
 K8S_MASTERS="10.0.0.241"
-MASTER_ROOT_PASS="kd11111"
+MASTER_ROOT_PASS=""
 #node IP list,at least 3
 K8S_NODES="10.0.0.242,10.0.0.243,10.0.0.244"
-NODE_ROOT_PASS="kd11111"
+NODE_ROOT_PASS=""
 #pod cluster ip range
 POD_CLUSTER_IP="10.52.0.0/16"
 #service cluster ip range
