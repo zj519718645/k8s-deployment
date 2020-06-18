@@ -1,3 +1,0 @@
-k8s-workstation=""
-k8s-masters=""
-k8s-nodes="""

@@ -6,20 +6,22 @@
 
 #=========define global varables=======
 #dynamic variables
+WORKSTATION_HOST="10.0.0.240"
+WORKSTATION_ROOT_PASS="kd11111"
 #master IP list,at least 1
-K8S_MASTERS=""
-MASTER_ROOT_PASS=""
+K8S_MASTERS="10.0.0.241"
+MASTER_ROOT_PASS="kd11111"
 #node IP list,at least 3
-K8S_NODES=""
-NODE_ROOT_PASS=""
+K8S_NODES="10.0.0.242,10.0.0.243,10.0.0.244"
+NODE_ROOT_PASS="kd11111"
 #pod cluster ip range
-POD_CLUSTER_IP=""
+POD_CLUSTER_IP="10.52.0.0/16"
 #service cluster ip range
-SERVICE_CLUSTER_IP=""
+SERVICE_CLUSTER_IP="10.53.0.0/16"
 #kubernetes ip
-KUBERNETES_IP=""
+KUBERNETES_IP="10.53.0.1"
 #kubernetes dns ip
-KUBERNETES_DNS_IP=""
+KUBERNETES_DNS_IP="10.53.0.2"
 
 #========define global functions=======
 FILE_TRANSFER() {
@@ -41,9 +43,9 @@ APISERVERFAILED=5
 NODESJOINFAILED=6
 
 #ftp server
-FTPHOST="134.175.150.58"
-FTPUSER="kdftp"
-FTPPASS="kd123.com"
+FTPHOST="ftp.kdshc.com"
+FTPUSER="kdftpuser"
+FTPPASS="kdshc@kingdee"
 
 #software name
 declare -A softwares_dic
@@ -141,11 +143,15 @@ do
     tar -xzf ${softwares_dic[$key]}
 done
 
+#================prepare workstation================
 #config salt-ssh roster
 if [ -f "/etc/salt/roster" ];then
-    rm -f /etc/salt/roster
+    mv /etc/salt/roster /etc/salt/roster_bak_`date "+%Y%m%d%H%M"`
 fi
-#================prepare workstation================
+echo "workstation-${WORKSTATION_HOST}:" >>/etc/salt/roster
+echo "  host: ${WORKSTATION_HOST}" >>/etc/salt/roster
+echo "  user: root" >>/etc/salt/roster
+echo "  passwd: ${WORKSTATION_ROOT_PASS}" >>/etc/salt/roster
 for master in ${master_array[@]}
 do
     echo "master-${master}:" >>/etc/salt/roster
@@ -193,7 +199,12 @@ cfssl gencert -ca=ca.pem -ca-key=ca-key.pem -config=ca-config.json -profile=kube
 cfssl gencert -ca=ca.pem -ca-key=ca-key.pem -config=ca-config.json -profile=kubernetes flanneld-csr.json | cfssljson -bare flanneld
 
 #distribute certs
-salt-ssh '*' -r 'mkdir -p /etc/kubernetes/ssl'
+salt-ssh -i 'master-*' -r 'mkdir -p /etc/kubernetes/ssl'
+if [ $? -ne 0 ];then
+    echo "above salt command execute failed on line ${LINENO}!"
+    exit ${SALTCOMMANDFAILED}
+fi
+salt-ssh -i 'node-*' -r 'mkdir -p /etc/kubernetes/ssl'
 if [ $? -ne 0 ];then
     echo "above salt command execute failed on line ${LINENO}!"
     exit ${SALTCOMMANDFAILED}
@@ -550,6 +561,8 @@ if [ $? -ne 0 ];then
 fi
 sleep 5s
 
+salt-ssh 'node-*' -r 'kubectl config use kubernetes'
+
 #accept csr
 kubectl get csr|grep 'Pending' | awk 'NR>0{print $1}'| xargs kubectl certificate approve
 kubectl get nodes
@@ -557,6 +570,11 @@ if [ $? -ne 0 ];then
     echo "nodes join failed!"
     exit ${NODESJOINFAILED}
 fi
+
+echo "------------------post installation-------------------"
+mv /etc/salt/roster /etc/salt/roster_k8s
+kubectl create namespace production
+
 
 echo "#======================================================"
 echo "               deploying succesfully                   "
